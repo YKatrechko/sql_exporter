@@ -14,8 +14,10 @@ import (
 	"github.com/prometheus/common/version"
 )
 
+const programName = "pgst_exporter"
+
 func init() {
-	prometheus.MustRegister(version.NewCollector("sql_exporter"))
+	prometheus.MustRegister(version.NewCollector(programName))
 }
 
 func main() {
@@ -29,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Fprintln(os.Stdout, version.Print("sql_exporter"))
+		fmt.Fprintln(os.Stdout, version.Print(programName))
 		os.Exit(0)
 	}
 
@@ -53,7 +55,7 @@ func main() {
 		logger = level.NewFilter(logger, level.AllowAll())
 	}
 
-	logger.Log("msg", "Starting sql_exporter", "version_info", version.Info(), "build_context", version.BuildContext())
+	logger.Log("msg", programName, "version_info", version.Info(), "build_context", version.BuildContext())
 
 	exporter, err := NewExporter(logger, *configFile)
 	if err != nil {
@@ -67,9 +69,9 @@ func main() {
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) { http.Error(w, "OK", http.StatusOK) })
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
-		<head><title>SQL Exporter</title></head>
+		<head><title>Postgres Cluster Exporter</title></head>
 		<body>
-		<h1>SQL Exporter</h1>
+		<h1>Postgres Cluster Exporter</h1>
 		<p><a href="` + *metricsPath + `">Metrics</a></p>
 		</body>
 		</html>
